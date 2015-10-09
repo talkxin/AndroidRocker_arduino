@@ -1,68 +1,59 @@
-#include <Servo.h>
-Servo myservo;
-Servo myservo1;
-int left1=1,left2=2;
-int right1=3,right2=4;
+const int xAxis = 1;         //analog sensor for X axis  
+const int yAxis = 2;         // analog sensor for Y axis
+int range = 12;               // output range of X or Y movement
+int responseDelay = 0;       // response delay of the mouse, in ms
+int threshold = range/4;      // resting threshold
+int center = range/2;         // resting position value
+int minima[] = { 
+  1023, 1023};                // actual analogRead minima for {x, y}
+  int maxima[] = {
+  0,0};                       // actual analogRead maxima for {x, y}
+  int axis[] = {
+  xAxis, yAxis};              // pin numbers for {x, y}
+int mouseReading[2];          // final mouse readings for {x, y}
+
+//边界测试
 int leftbutton=5,rightbutton=6;
-int lx,ly;
-int rx,ry;
 int lb,rb;
-void setup()
-{
-	pinMode(leftbutton, INPUT);
-  	pinMode(rightbutton, INPUT);
- 	myservo.attach(9);  // 9号引脚输出电机控制信号
-  	myservo1.attach(10);
-  	Serial.begin(9600);         //仅能使用9、10号引脚
-  	Mouse.begin();
-}
-void loop()
-{
-	lb=digitalRead(leftbutton);
-	rb=digitalRead(rightbutton);
-	if(lb==LOW){
-		Mouse.move(10,0,0);
-		// Serial.println("left button");
-	}
-	if(rb==LOW){
-		Serial.println("Rigth button");
-	}
-	// Serial.print("left x:");
-	// Serial.println(lx);
-	// delay(15);
-	// Serial.print("left y");
-	// Serial.println(ly);
-	// delay(15);
-	// Serial.print("right x:");
-	// Serial.println(rx);
-	// delay(15);
-	// Serial.print("right y");
-	// Serial.println(ry);
-	lx=analogRead(left1);
-	ly=analogRead(left2);
-	rx=analogRead(right1);
-	ry=analogRead(right2);
-	lx = map(lx, 0, 1023, 0, 179);
-	ly = map(ly, 0, 1023, 0, 179);
-	rx = map(rx, 0, 1023, 0, 179); 
-	ry = map(ry, 0, 1023, 0, 179);
-	// myservo.write(lx);
- //  	myservo1.write(ly);
-	// myservo.write(rx);
- //  	myservo1.write(ry);
-  	delay(15);
- //  Serial.print("servo:");
- //  Serial.println(val);
- //  delay(15);
- //  Serial.print("servo1:");
- //  Serial.println(val1);
- //  val = analogRead(analogPin);
- //  val1 = analogRead(analogPin1);
- // // 读取来自可变电阻的模拟值（0到1023之间）
- //  val = map(val, 0, 1023, 0, 179);     // 利用“map”函数缩放该值，得到伺服电机需要的角度（0到180之间）
- //  val1 = map(val1, 0, 1023, 0, 179);
- //  myservo.write(val);     // 设定伺服电机的位置
- //  myservo1.write(val1);
- //  delay(15);             // 等待电机旋转到目标角度
+int pm=1;
+void setup() {
+    Mouse.begin();
+    Serial.begin(9600);
+  }
+
+  void loop() {
+int xReading = readAxis(0);
+int yReading = readAxis(1);
+Mouse.move(xReading, -yReading, 0);
+delay(responseDelay);
 }
 
+/*
+  reads an axis (0 or 1 for x or y) and scales the 
+  analog input range to a range from 0 to <range>
+  */
+
+  int readAxis(int axisNumber) {
+  int distance = 0;    // distance from center of the output range
+
+  // read the analog input:
+  int reading = analogRead(axis[axisNumber]);
+
+
+  // map the reading from the analog input range to the output range:
+  reading = map(reading, minima[axisNumber], maxima[axisNumber], 0, range);
+ // if the output reading is outside from the
+ // rest position threshold,  use it:
+ if (abs(reading - center) > threshold) {
+  distance = (reading - center);
+} 
+
+  // the Y axis needs to be inverted in order to 
+  // map the movemment correctly:
+  if (axisNumber == 1) {
+    distance = -distance;
+  }
+
+  // return the distance for this axis:
+  return distance;
+}
