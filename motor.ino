@@ -1,6 +1,6 @@
 //http://forum.arduino.cc/index.php?topic=258091.0
 
-//  Specify pixel positions for a 640x480 screen
+//  分辨率按显示器最低分辨率来计算，行程均为分辨率的一半
 const int ScreenWidth = 800;
 const int ScreenHeight = 600;
 const int ScreenXLeft = 0;
