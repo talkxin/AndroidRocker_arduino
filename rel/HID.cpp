@@ -227,6 +227,7 @@ void Mouse_::move(int16_t x, int16_t y, int16_t wheel)
 	//m[2] = y;
 	//m[3] = wheel;
 	//HID_SendReport(1,m,4);
+	//https://www.lpcware.com/content/forum/hid-mouse-increasing-travel-movement
 	u8 m[7];
 	m[0] = _buttons; // TODO: is it a good idea to take over the _buttons from relative report here or should it be left out?
 	m[1] = x; 
