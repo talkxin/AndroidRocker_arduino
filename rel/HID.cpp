@@ -229,12 +229,9 @@ void Mouse_::move(int16_t x, int16_t y, int16_t wheel)
 	//HID_SendReport(1,m,4);
 	u8 m[7];
 	m[0] = _buttons; // TODO: is it a good idea to take over the _buttons from relative report here or should it be left out?
-	m[1] = LSB(x);
-	m[2] = MSB(x);
-	m[3] = LSB(y);
-	m[4] = MSB(y);
-	m[5] = LSB(wheel);
-	m[6] = MSB(wheel);
+	m[1] = x; 
+	m[3] = y;
+	m[5] = wheel;
 	HID_SendReport(1,m,7);
 }
 
